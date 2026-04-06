@@ -1,0 +1,323 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Diagnóstico de Varicela">
+  <div transition:animate="slide">
+    <p style="color:var(--gray);margin-bottom:1.5rem;font-size:0.95rem;">
+      Complete el formulario con los datos del paciente para obtener un diagnóstico asistido por el sistema experto Prolog.
+    </p>
+
+    <form id="form-diagnostico">
+
+      <!-- SECCIÓN 1: DATOS DEL PACIENTE -->
+      <div class="card">
+        <h2>👤 Datos del Paciente</h2>
+        <div class="grid-2">
+          <div class="field">
+            <label>Nombre del paciente</label>
+            <input type="text" name="nombre" placeholder="Ej: Juan García" required />
+          </div>
+          <div class="field">
+            <label>Edad</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="edad" value="nino" required /> Niño (≤12 años)
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="edad" value="adulto" /> Adulto (&gt;12 años)
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Sexo</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="sexo" value="masculino" required /> Masculino
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="sexo" value="femenino" /> Femenino
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: SÍNTOMAS -->
+      <div class="card">
+        <h2>🤒 Síntomas Actuales</h2>
+        <p class="hint">Marque todos los síntomas que presenta el paciente.</p>
+        <div class="checkbox-grid">
+          <label class="check-label clave"><input type="checkbox" name="sintomas" value="fiebre" /> 🌡️ Fiebre</label>
+          <label class="check-label clave"><input type="checkbox" name="sintomas" value="erupcion_cutanea" /> 🔴 Erupción cutánea</label>
+          <label class="check-label clave"><input type="checkbox" name="sintomas" value="vesiculas" /> 💧 Vesículas (ampollas)</label>
+          <label class="check-label clave"><input type="checkbox" name="sintomas" value="picazon" /> 🫧 Picazón (prurito)</label>
+          <label class="check-label"><input type="checkbox" name="sintomas" value="malestar_general" /> 😔 Malestar general</label>
+          <label class="check-label"><input type="checkbox" name="sintomas" value="dolor_cabeza" /> 🤕 Dolor de cabeza</label>
+          <label class="check-label"><input type="checkbox" name="sintomas" value="fatiga" /> 😴 Fatiga</label>
+          <label class="check-label"><input type="checkbox" name="sintomas" value="tos" /> 😷 Tos</label>
+          <label class="check-label"><input type="checkbox" name="sintomas" value="dolor_garganta" /> 🗣️ Dolor de garganta</label>
+          <label class="check-label grave"><input type="checkbox" name="sintomas" value="dificultad_respiratoria" /> ⚠️ Dificultad respiratoria</label>
+          <label class="check-label"><input type="checkbox" name="sintomas" value="perdida_apetito" /> 🍽️ Pérdida de apetito</label>
+        </div>
+        <div class="legend">
+          <span class="dot clave"></span> Síntoma clave de varicela &nbsp;
+          <span class="dot grave"></span> Síntoma de alarma
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: ANTECEDENTES -->
+      <div class="card">
+        <h2>📋 Antecedentes Médicos</h2>
+        <div class="grid-2">
+          <div class="field">
+            <label>Contacto con varicela</label>
+            <label class="toggle-label">
+              <input type="checkbox" name="contacto" value="true" id="contacto-check" />
+              <span>Tuvo contacto con persona con varicela</span>
+            </label>
+          </div>
+          <div class="field">
+            <label>Estado de vacunación</label>
+            <select name="vacunacion" required>
+              <option value="">-- Seleccione --</option>
+              <option value="ninguna">Sin vacunar</option>
+              <option value="incompleta">Vacunación incompleta</option>
+              <option value="completa">Vacunación completa</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field mt">
+          <label>Condiciones especiales</label>
+          <div class="checkbox-grid small">
+            <label class="check-label"><input type="checkbox" name="condiciones" value="ninguna" id="cond-ninguna" /> Ninguna</label>
+            <label class="check-label"><input type="checkbox" name="condiciones" value="embarazo" /> 🤰 Embarazo</label>
+            <label class="check-label"><input type="checkbox" name="condiciones" value="inmunosupresion" /> 🛡️ Inmunosupresión</label>
+          </div>
+        </div>
+
+        <div class="field mt">
+          <label>Historial médico previo</label>
+          <div class="checkbox-grid small">
+            <label class="check-label"><input type="checkbox" name="historial" value="ninguno" id="hist-ninguno" /> Ninguno</label>
+            <label class="check-label"><input type="checkbox" name="historial" value="hipertension" /> 💊 Hipertensión</label>
+            <label class="check-label"><input type="checkbox" name="historial" value="diabetes" /> 🩸 Diabetes</label>
+            <label class="check-label"><input type="checkbox" name="historial" value="asma" /> 🫁 Asma</label>
+            <label class="check-label"><input type="checkbox" name="historial" value="enfermedad_renal" /> 🫘 Enf. renal</label>
+          </div>
+        </div>
+
+        <div class="field mt">
+          <label>Alergias a medicamentos</label>
+          <div class="checkbox-grid small">
+            <label class="check-label"><input type="checkbox" name="alergias" value="ninguna" id="alerg-ninguna" /> Ninguna</label>
+            <label class="check-label"><input type="checkbox" name="alergias" value="paracetamol" /> Paracetamol</label>
+            <label class="check-label"><input type="checkbox" name="alergias" value="antihistaminico" /> Antihistamínico</label>
+            <label class="check-label"><input type="checkbox" name="alergias" value="aciclovir" /> Aciclovir</label>
+            <label class="check-label"><input type="checkbox" name="alergias" value="ibuprofeno" /> Ibuprofeno</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: LABORATORIO -->
+      <div class="card">
+        <h2>🧪 Resultados de Laboratorio <span class="optional">(opcional)</span></h2>
+        <div class="grid-3">
+          <div class="field">
+            <label>Temperatura (°C)</label>
+            <input type="number" name="temperatura" step="0.1" min="35" max="43" placeholder="Ej: 38.5" />
+          </div>
+          <div class="field">
+            <label>Leucocitos (/mm³)</label>
+            <input type="number" name="leucocitos" step="100" min="0" placeholder="Ej: 9000" />
+          </div>
+          <div class="field">
+            <label>PCR (Proteína C Reactiva)</label>
+            <select name="pcr">
+              <option value="">-- Sin datos --</option>
+              <option value="normal">Normal</option>
+              <option value="bajo">Bajo</option>
+              <option value="moderado">Moderado</option>
+              <option value="alto">Alto</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 5: FEEDBACK -->
+      <div class="card">
+        <h2>💬 Feedback del Paciente</h2>
+        <p class="hint">Si el paciente ya recibió tratamiento, indique la tolerancia y evolución.</p>
+        <div class="grid-3">
+          <div class="field">
+            <label>Tolerancia a Paracetamol</label>
+            <select name="feedbackParacetamol">
+              <option value="na">No aplica / Sin datos</option>
+              <option value="tolera_bien">Tolera bien</option>
+              <option value="no_tolera">No tolera</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Tolerancia a Antihistamínico</label>
+            <select name="feedbackAntihistaminico">
+              <option value="na">No aplica / Sin datos</option>
+              <option value="tolera_bien">Tolera bien</option>
+              <option value="no_tolera">No tolera</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Evolución de síntomas</label>
+            <select name="feedbackSintomas">
+              <option value="na">Sin datos</option>
+              <option value="mejorando">Mejorando</option>
+              <option value="estable">Estable</option>
+              <option value="empeorando">Empeorando ⚠️</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="error-msg" style="display:none;" class="error-box"></div>
+
+      <div style="text-align:center;margin-top:1rem;">
+        <button type="submit" class="btn btn-primary" id="submit-btn">
+          <span id="btn-text">🔍 Obtener Diagnóstico</span>
+          <span id="btn-loading" style="display:none;">⏳ Analizando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</Layout>
+
+<style>
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field label { font-size: 0.85rem; font-weight: 600; color: var(--blue-dark); }
+  .field input[type="text"],
+  .field input[type="number"],
+  .field select {
+    padding: 0.6rem 0.8rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    background: white;
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,111,196,0.1);
+  }
+  .radio-group { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .radio-label { display: flex; align-items: center; gap: 0.4rem; cursor: pointer; font-size: 0.9rem; }
+  .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; }
+  .checkbox-grid.small { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .check-label {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    font-size: 0.88rem;
+    transition: all 0.15s;
+    background: white;
+  }
+  .check-label:hover { border-color: var(--blue); background: var(--blue-light); }
+  .check-label.clave { border-color: #bee3f8; }
+  .check-label.grave { border-color: #fbd38d; }
+  .check-label input { accent-color: var(--blue); }
+  .toggle-label {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    font-size: 0.88rem;
+    background: white;
+  }
+  .toggle-label input { accent-color: var(--teal); }
+  .hint { font-size: 0.82rem; color: var(--gray); margin-bottom: 0.8rem; }
+  .mt { margin-top: 1rem; }
+  .optional { font-weight: 400; font-size: 0.8rem; color: var(--gray); margin-left: 0.5rem; }
+  .legend { margin-top: 0.8rem; font-size: 0.78rem; color: var(--gray); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 3px; }
+  .dot.clave { background: #bee3f8; border: 1px solid #90cdf4; }
+  .dot.grave { background: #fbd38d; border: 1px solid #f6ad55; }
+  .error-box {
+    background: var(--red-light);
+    border: 1px solid var(--red);
+    color: var(--red);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+</style>
+
+<script>
+  import { navigate } from 'astro:transitions/client';
+
+  const form = document.getElementById('form-diagnostico') as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const btnText = document.getElementById('btn-text') as HTMLElement;
+  const btnLoading = document.getElementById('btn-loading') as HTMLElement;
+  const errorMsg = document.getElementById('error-msg') as HTMLElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline';
+    submitBtn.disabled = true;
+    errorMsg.style.display = 'none';
+
+    const fd = new FormData(form);
+
+    const patientData = {
+      nombre: fd.get('nombre') as string,
+      edad: fd.get('edad') as string,
+      sexo: fd.get('sexo') as string,
+      sintomas: fd.getAll('sintomas') as string[],
+      contacto: fd.get('contacto') === 'true',
+      vacunacion: fd.get('vacunacion') as string,
+      alergias: fd.getAll('alergias') as string[],
+      condiciones: fd.getAll('condiciones') as string[],
+      historial: fd.getAll('historial') as string[],
+      temperatura: fd.get('temperatura') ? parseFloat(fd.get('temperatura') as string) : null,
+      leucocitos: fd.get('leucocitos') ? parseInt(fd.get('leucocitos') as string) : null,
+      pcr: fd.get('pcr') as string || '',
+      feedbackParacetamol: fd.get('feedbackParacetamol') as string,
+      feedbackAntihistaminico: fd.get('feedbackAntihistaminico') as string,
+      feedbackSintomas: fd.get('feedbackSintomas') as string,
+    };
+
+    try {
+      const res = await fetch('/api/diagnostico', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patientData)
+      });
+
+      const result = await res.json();
+
+      if (result.error) {
+        errorMsg.textContent = '❌ Error: ' + result.error;
+        errorMsg.style.display = 'block';
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+        submitBtn.disabled = false;
+        return;
+      }
+
+      sessionStorage.setItem('diagnostico_result', JSON.stringify(result));
+      sessionStorage.setItem('diagnostico_nombre', patientData.nombre);
+      navigate('/resultado');
+    } catch (err) {
+      errorMsg.textContent = '❌ Error de red: ' + String(err);
+      errorMsg.style.display = 'block';
+      btnText.style.display = 'inline';
+      btnLoading.style.display = 'none';
+      submitBtn.disabled = false;
+    }
+  });
+</script>

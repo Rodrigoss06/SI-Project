@@ -1,0 +1,226 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Resultado del Diagnóstico">
+  <div id="loading" style="text-align:center;padding:3rem;color:var(--gray);">
+    <div style="font-size:2rem;margin-bottom:1rem;">⏳</div>
+    <p>Cargando resultado...</p>
+  </div>
+
+  <div id="resultado-container" style="display:none;" transition:animate="slide">
+    <!-- Injected by JS -->
+  </div>
+
+  <div id="no-data" style="display:none;text-align:center;padding:3rem;">
+    <p style="color:var(--gray);margin-bottom:1rem;">No hay datos de diagnóstico disponibles.</p>
+    <a href="/" class="btn btn-primary">← Nuevo Diagnóstico</a>
+  </div>
+</Layout>
+
+<style>
+  .diag-card {
+    border-radius: var(--radius);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .diag-card.leve { background: var(--green-light); border: 2px solid var(--green); }
+  .diag-card.grave { background: var(--red-light); border: 2px solid var(--red); }
+  .diag-card.descartado { background: var(--blue-light); border: 2px solid var(--blue); }
+  .diag-card.error { background: #fef9e7; border: 2px solid var(--orange); }
+  .diag-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+  .diag-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .diag-subtitle { font-size: 1rem; opacity: 0.75; }
+  .badges { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+  .badge {
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-alta { background: var(--red); color: white; }
+  .badge-media { background: var(--orange); color: white; }
+  .badge-baja { background: var(--teal); color: white; }
+  .badge-grave { background: #8b0000; color: white; }
+  .badge-hospitalario { background: var(--red); color: white; }
+  .badge-ambulatorio { background: var(--teal); color: white; }
+  .grid-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; }
+  .result-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.2rem; }
+  .result-card h3 { font-size: 0.9rem; font-weight: 700; color: var(--blue-dark); margin-bottom: 0.8rem; border-bottom: 2px solid var(--blue-light); padding-bottom: 0.5rem; }
+  .list-items { list-style: none; padding: 0; }
+  .list-items li { padding: 0.35rem 0; font-size: 0.88rem; display: flex; align-items: flex-start; gap: 0.5rem; }
+  .list-items li::before { content: '•'; color: var(--blue); font-weight: bold; flex-shrink: 0; }
+  .list-items.danger li::before { color: var(--red); content: '⚠'; }
+  .list-items.success li::before { color: var(--green); content: '✓'; }
+  .lab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .lab-item { background: var(--gray-light); border-radius: 8px; padding: 0.6rem 0.8rem; }
+  .lab-item .lab-label { font-size: 0.75rem; color: var(--gray); font-weight: 600; text-transform: uppercase; }
+  .lab-item .lab-value { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-top: 0.2rem; }
+  .lab-item.warn .lab-value { color: var(--orange); }
+  .lab-item.danger .lab-value { color: var(--red); }
+  .lab-item.ok .lab-value { color: var(--teal); }
+  .empty-state { color: var(--gray); font-size: 0.85rem; font-style: italic; padding: 0.5rem 0; }
+  .actions { text-align: center; margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .paciente-nombre { font-size: 0.9rem; color: var(--gray); margin-bottom: 0.3rem; }
+</style>
+
+<script>
+  const loading = document.getElementById('loading')!;
+  const container = document.getElementById('resultado-container')!;
+  const noData = document.getElementById('no-data')!;
+
+  const raw = sessionStorage.getItem('diagnostico_result');
+  const nombre = sessionStorage.getItem('diagnostico_nombre') || 'Paciente';
+
+  if (!raw) {
+    loading.style.display = 'none';
+    noData.style.display = 'block';
+  } else {
+    const d = JSON.parse(raw);
+    loading.style.display = 'none';
+    container.style.display = 'block';
+    container.innerHTML = buildHTML(d, nombre);
+  }
+
+  function t(key: string): string {
+    const map: Record<string, string> = {
+      varicela_leve: 'Varicela Leve',
+      varicela_grave: 'Varicela Grave',
+      descartado: 'Varicela Descartada',
+      sin_diagnostico: 'Sin diagnóstico concluyente',
+      error: 'Error en el sistema',
+      paracetamol: 'Paracetamol (analgésico / antipirético)',
+      antihistaminico: 'Antihistamínico (para el prurito)',
+      hidratacion: 'Hidratación abundante',
+      reposo: 'Reposo domiciliario',
+      aislamiento: 'Aislamiento del paciente',
+      aciclovir: 'Aciclovir (antiviral — caso grave)',
+      ibuprofeno: 'Ibuprofeno (alternativo)',
+      evitar_rascado: 'Evitar rascarse las lesiones',
+      usar_ropa_ligera: 'Usar ropa ligera y suave',
+      mantener_hidratacion: 'Mantener buena hidratación',
+      aislamiento_domiciliario: 'Aislamiento domiciliario 7–10 días',
+      cortar_unas: 'Cortar las uñas (prevenir sobreinfección)',
+      bano_agua_tibia: 'Baños con agua tibia y jabón suave',
+      neumonia: 'Neumonía',
+      infeccion_bacteriana: 'Infección bacteriana secundaria',
+      sobreinfeccion_cutanea: 'Sobreinfección cutánea',
+      encefalitis: 'Encefalitis',
+      complicacion_general: 'Complicación sistémica',
+      monitoreo_cardiaco: 'Monitoreo cardíaco (antecedente de hipertensión)',
+      control_glucemia: 'Control de glucemia (antecedente de diabetes)',
+      cuidado_respiratorio: 'Cuidado respiratorio (antecedente de asma)',
+      vigilancia_renal: 'Vigilancia renal',
+      hospitalario: 'Hospitalización requerida',
+      ambulatorio: 'Manejo ambulatorio (en casa)',
+      alta: 'ALTA',
+      media: 'MEDIA',
+      baja: 'BAJA',
+      sin_datos: 'Sin datos',
+      normal: 'Normal',
+      subfebril: 'Subfebril (37.5–37.9°C)',
+      fiebre_moderada: 'Fiebre moderada (38–38.9°C)',
+      fiebre_alta: 'Fiebre alta (39–39.9°C)',
+      fiebre_muy_alta: 'Fiebre muy alta (≥40°C) ⚠',
+      leucopenia: 'Leucopenia (&lt;4,000)',
+      leucocitosis_leve: 'Leucocitosis leve (10,001–15,000)',
+      leucocitosis_moderada: 'Leucocitosis moderada (15,001–20,000)',
+      leucocitosis_severa: 'Leucocitosis severa (&gt;20,000) ⚠',
+    };
+    return map[key] || key.replace(/_/g, ' ');
+  }
+
+  function diagClass(diag: string): string {
+    if (diag === 'varicela_leve') return 'leve';
+    if (diag === 'varicela_grave') return 'grave';
+    if (diag === 'descartado') return 'descartado';
+    return 'error';
+  }
+
+  function diagIcon(diag: string): string {
+    if (diag === 'varicela_leve') return '🟢';
+    if (diag === 'varicela_grave') return '🔴';
+    if (diag === 'descartado') return '🔵';
+    return '⚠️';
+  }
+
+  function prioClass(p: string): string {
+    if (p === 'alta') return 'badge-alta';
+    if (p === 'media') return 'badge-media';
+    return 'badge-baja';
+  }
+
+  function labClass(val: string): string {
+    if (!val || val === 'sin_datos' || val === 'normal') return 'ok';
+    if (val.includes('alta') || val.includes('muy') || val.includes('severa')) return 'danger';
+    return 'warn';
+  }
+
+  function listHTML(items: string[], cls = ''): string {
+    if (!items || items.length === 0) return '<p class="empty-state">Ninguno</p>';
+    return `<ul class="list-items ${cls}">${items.map(i => `<li>${t(i)}</li>`).join('')}</ul>`;
+  }
+
+  function buildHTML(d: any, nombre: string): string {
+    return `
+      <p class="paciente-nombre">Paciente: <strong>${nombre}</strong></p>
+
+      <div class="diag-card ${diagClass(d.diagnostico)}">
+        <div class="diag-icon">${diagIcon(d.diagnostico)}</div>
+        <div class="diag-title">${t(d.diagnostico)}</div>
+        <div class="diag-subtitle">Resultado del análisis del sistema experto</div>
+        <div class="badges">
+          <span class="badge ${prioClass(d.prioridad)}">Prioridad ${t(d.prioridad)}</span>
+          ${d.grave === 'si' ? '<span class="badge badge-grave">CASO GRAVE</span>' : ''}
+          <span class="badge ${d.manejo === 'hospitalario' ? 'badge-hospitalario' : 'badge-ambulatorio'}">${t(d.manejo)}</span>
+        </div>
+      </div>
+
+      <div class="grid-results">
+        <div class="result-card">
+          <h3>🧪 Interpretación de Laboratorio</h3>
+          <div class="lab-grid">
+            <div class="lab-item ${labClass(d.temperatura_interp)}">
+              <div class="lab-label">Temperatura</div>
+              <div class="lab-value">${t(d.temperatura_interp)}</div>
+            </div>
+            <div class="lab-item ${labClass(d.leucocitos_interp)}">
+              <div class="lab-label">Leucocitos</div>
+              <div class="lab-value">${t(d.leucocitos_interp)}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <h3>💊 Tratamientos Recomendados</h3>
+          ${listHTML(d.tratamientos, 'success')}
+        </div>
+
+        <div class="result-card">
+          <h3>📌 Recomendaciones Generales</h3>
+          ${listHTML(d.recomendaciones)}
+        </div>
+
+        <div class="result-card">
+          <h3>⚠️ Riesgo de Complicaciones</h3>
+          ${listHTML(d.complicaciones, 'danger')}
+        </div>
+
+        ${d.precauciones && d.precauciones.length > 0 ? `
+        <div class="result-card">
+          <h3>🩺 Precauciones por Historial</h3>
+          ${listHTML(d.precauciones)}
+        </div>` : ''}
+      </div>
+
+      <div class="actions">
+        <a href="/" class="btn btn-secondary">← Nuevo Diagnóstico</a>
+        <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir</button>
+      </div>
+    `;
+  }
+</script>
