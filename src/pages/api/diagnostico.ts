@@ -4,7 +4,7 @@ import { runDiagnosis } from '../../lib/prologBridge.js';
 export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
-    const result = runDiagnosis(data);
+    const result = await runDiagnosis(data);
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

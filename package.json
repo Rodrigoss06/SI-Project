@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^8.3.3",
-    "astro": "^4.16.6"
+    "astro": "^4.16.6",
+    "tau-prolog": "^0.3.4"
   }
 }
