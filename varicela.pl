@@ -202,6 +202,10 @@ varicela_probable(P) :-
     sospecha_moderada_varicela(P),
     tuvo_contacto(P,varicela).
 
+varicela_probable(P) :-
+    sospecha_moderada_varicela(P),
+    fiebre_clinica(P).
+
 diagnostico(P,varicela) :-
     varicela_probable(P).
 
